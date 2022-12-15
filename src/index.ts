@@ -1,17 +1,23 @@
 import { useEffect, useRef } from 'react';
 
-const defaultOptions = {
+type Options = {
+  speed?: number,
+  friction?: number,
+  maxAngularVelocity?: number,
+}
+
+const defaultOptions: Options = {
   speed: 0.6,
   friction: 0.00023,
   maxAngularVelocity: 0.0135,
 };
 
-const useAnimate = function(callback) {
+const useAnimate = (callback: (deltaTime: number) => void) => {
   // Use useRef for mutable variables that we want to persist
   // without triggering a re-render on their change
-  const requestRef = useRef(null);
-  const previousTimeRef = useRef(null);
-  const animate = function(time) {
+  const requestRef = useRef<number>(0);
+  const previousTimeRef = useRef<number>(0);
+  const animate = (time: number) => {
     if (previousTimeRef.current != undefined) {
       const deltaTime = time - previousTimeRef.current;
       callback(deltaTime);
@@ -19,22 +25,20 @@ const useAnimate = function(callback) {
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(animate);
   }
-  useEffect(function() {
+  useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
-    return function() {
-      cancelAnimationFrame(requestRef.current)
-    };
+    return () => cancelAnimationFrame(requestRef.current);
   }, []); // Make sure the effect runs only once
 };
 
-const useScrollSpinner = function(options) {
+const useScrollSpinner = (options: Options) => {
   options = Object.assign(defaultOptions, options);
-  const spinner = useRef(null);
+  const spinner = useRef<HTMLElement>(null);
   const spinnerAngle = useRef(0);
   const spinnerAngVel = useRef(0);
   const scroll = useRef(0);
   const prevScroll = useRef(0);
-  useAnimate(function(deltaTime) {
+  useAnimate((deltaTime) => {
     if (!spinner.current) {
       return;
     }
@@ -43,7 +47,7 @@ const useScrollSpinner = function(options) {
 
     // Convert to angle change, velocity and direction
     const radius = 0.5 * spinner.current.clientWidth;
-    const deltaAngle = options.speed * deltaScroll / radius;
+    const deltaAngle = (options.speed ?? 0) * deltaScroll / radius;
     const angularVel = deltaAngle / deltaTime;
     const angularDir = Math.sign(angularVel);
 
@@ -56,7 +60,7 @@ const useScrollSpinner = function(options) {
     // Apply friction
     if (spinnerAngVel.current !== 0) {
       const currentAngularDir = Math.sign(spinnerAngVel.current);
-      spinnerAngVel.current -= currentAngularDir * options.friction * Math.sqrt(Math.abs(spinnerAngVel.current)) * deltaTime;
+      spinnerAngVel.current -= currentAngularDir * (options.friction ?? 0) * Math.sqrt(Math.abs(spinnerAngVel.current)) * deltaTime;
 
       // If angular direction has changed due to friction, clamp to 0.
       if (Math.sign(spinnerAngVel.current) !== currentAngularDir) {
@@ -65,7 +69,7 @@ const useScrollSpinner = function(options) {
     }
 
     // Apply max limit to angular velocity
-    spinnerAngVel.current = clamp(spinnerAngVel.current, -options.maxAngularVelocity, options.maxAngularVelocity);
+    spinnerAngVel.current = clamp(spinnerAngVel.current, -(options.maxAngularVelocity ?? 0), options.maxAngularVelocity ?? 0);
 
     // Apply angular velocity
     spinnerAngle.current -= spinnerAngVel.current * deltaTime;
@@ -74,17 +78,17 @@ const useScrollSpinner = function(options) {
   });
   return {
     spinnerRef: spinner,
-    setSpinnerScroll: function(value) {
+    setSpinnerScroll: (value: number) => {
       scroll.current = value;
     },
   };
 };
 
-const clamp = function(value, min, max) {
+const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);
 };
 
-const rad2deg = function(value) {
+const rad2deg = (value: number) => {
   return value * 180 / Math.PI;
 };
 
