@@ -2,7 +2,7 @@
 
 Make HTML elements spin in response to scrolling. Spinning slows down with friction. Works with vertical and horizontal scrolling on any element. [Live example](https://pugs.ly/).
 
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/14273589/207964523-d8586dd9-7495-4028-97df-d0076b51a236.gif)
+![React scroll spinner on Dan Pugsley's portfolio](https://user-images.githubusercontent.com/14273589/207964523-d8586dd9-7495-4028-97df-d0076b51a236.gif)
 
 ### Installation
 ```
