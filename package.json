@@ -15,7 +15,15 @@
     "type": "git",
     "url": "git+https://github.com/dan-pugsley/react-scroll-spinner.git"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "hook",
+    "scroll",
+    "scrolling",
+    "spinner",
+    "spinning",
+    "spin"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
